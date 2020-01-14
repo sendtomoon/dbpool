@@ -2,6 +2,7 @@ package com.sendtomoon.dbpool;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -45,6 +46,39 @@ public abstract class Pool {
 			DriverManager.registerDriver(driver);
 		} catch (Exception e) {
 
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public abstract void createdPool();
+
+	public static synchronized Pool getInstance()
+			throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		if (instance == null) {
+			instance.init();
+			instance = (Pool) Class.forName("com.sendtomoon.dbpool.Pool").newInstance();
+		}
+		return instance;
+	}
+
+	public abstract Connection getConnection();
+
+	public abstract Connection getConnection(long time);
+
+	public abstract void freeConnection(Connection conn);
+
+	public abstract int getnum();
+
+	public abstract int getnumActive();
+
+	// 撤销驱动
+	protected synchronized void release() {
+		try {
+			DriverManager.deregisterDriver(driver);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
