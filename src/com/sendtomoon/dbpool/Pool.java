@@ -17,7 +17,7 @@ public abstract class Pool {
 
 	protected int normalConnect = 10; // 保持链接数
 
-	protected String driverName = null; // JDBC驱动字符串
+	protected String dirvername = null; // JDBC驱动字符串
 
 	protected Driver driver = null; // JDBC驱动实例
 
@@ -25,7 +25,7 @@ public abstract class Pool {
 	protected Pool() {
 		try {
 			init();
-			loadDirver(driverName);
+			loadDirver(dirvername);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -35,7 +35,7 @@ public abstract class Pool {
 		InputStream is = Pool.class.getResourceAsStream(propertiesName);
 		Properties prop = new Properties();
 		prop.load(is);
-		this.driverName = prop.getProperty("dirverName");
+		this.dirvername = prop.getProperty("dirvername");
 		this.maxConnect = Integer.parseInt(prop.getProperty("maxConnect"));
 		this.normalConnect = Integer.parseInt(prop.getProperty("normalConnect"));
 	}
