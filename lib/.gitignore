@@ -1,3 +1,8 @@
 /mariadb-java-client-2.4.2.jar
 /mybatis-3.5.2.jar
 /ojdbc.jar
+/commons-logging-1.2-javadoc.jar
+/commons-logging-1.2.jar
+/slf4j-api-1.7.9-javadoc.jar
+/slf4j-api-1.7.9-sources.jar
+/slf4j-api-1.7.9.jar

@@ -30,6 +30,7 @@ public final class DBConnectionPool extends Pool {
 	private static DBConnectionPool pool = null;// 连接池实例变量
 
 	// 生成数据连接池
+	// 懒汉模式写法
 	public static synchronized DBConnectionPool getInstance() {
 		if (pool == null) {
 			pool = new DBConnectionPool();
@@ -116,7 +117,7 @@ public final class DBConnectionPool extends Pool {
 		} else if (maxConnect == 0 || checkedOut < maxConnect) {
 			conn = newConnection();
 		} else {
-			System.err.println("没有可以连接资源");
+//			System.err.println("没有可以连接资源");
 			return null;
 		}
 		if (conn != null) {

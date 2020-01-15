@@ -13,8 +13,8 @@ public class ThreadPoolTest {
 
 	public static void main(String[] args) throws Exception {
 		ExecutorService es = Executors.newFixedThreadPool(100);
-		Pool pool = DBConnectionPool.getInstance();
 		for (int i = 1; i <= 1000; i++) {
+			Pool pool = DBConnectionPool.getInstance();
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
@@ -29,6 +29,7 @@ public class ThreadPoolTest {
 							System.err.println(rs.getString(1));
 						}
 						pool.freeConnection(conn);
+//						System.err.println(Thread.currentThread().getName() + pool);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
