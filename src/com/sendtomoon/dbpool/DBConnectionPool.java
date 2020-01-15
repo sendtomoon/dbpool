@@ -10,7 +10,12 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class DBConnectionPool extends Pool {
+
+	private Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private int checkedOut;// 正在使用的连接数
 
@@ -21,6 +26,7 @@ public final class DBConnectionPool extends Pool {
 	private String username = null;
 	private static int num = 0;// 空闲连接数
 	private static int numActive = 0;// 当前可用连接数
+	private int connectionTimeOut = 2000;// 等待超时时间
 	private static DBConnectionPool pool = null;// 连接池实例变量
 
 	// 生成数据连接池
@@ -36,7 +42,11 @@ public final class DBConnectionPool extends Pool {
 		try {
 			init();
 			for (int i = 0; i < normalConnect; i++) {
-
+				Connection conn = newConnection();
+				if (conn != null) {
+					freeConnections.addElement(conn);
+					num++;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -53,6 +63,7 @@ public final class DBConnectionPool extends Pool {
 		this.dirvername = prop.getProperty("dirvername");
 		this.maxConnect = Integer.parseInt(prop.getProperty("maxConnect"));
 		this.normalConnect = Integer.parseInt(prop.getProperty("normalConnect"));
+		this.connectionTimeOut = Integer.parseInt(prop.getProperty("connectionTimeOut"));
 	}
 
 	@Override
@@ -89,7 +100,7 @@ public final class DBConnectionPool extends Pool {
 
 	// 单例模式获取一个连接
 	@Override
-	public Connection getConnection() {
+	public synchronized Connection getConnection() {
 		Connection conn = null;
 		if (freeConnections.size() > 0) {
 			num--;
@@ -104,6 +115,9 @@ public final class DBConnectionPool extends Pool {
 			}
 		} else if (maxConnect == 0 || checkedOut < maxConnect) {
 			conn = newConnection();
+		} else {
+			System.err.println("没有可以连接资源");
+			return null;
 		}
 		if (conn != null) {
 			checkedOut++;
@@ -113,7 +127,7 @@ public final class DBConnectionPool extends Pool {
 	}
 
 	@Override
-	public Connection getConnection(long timeout) {
+	public synchronized Connection getConnection(long timeout) {
 		long startTime = new Date().getTime();
 		Connection conn;
 		while ((conn = getConnection()) == null) {
@@ -122,7 +136,7 @@ public final class DBConnectionPool extends Pool {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if ((new Date().getTime() - startTime) >= timeout) {
+			if ((new Date().getTime() - startTime) >= connectionTimeOut) {
 				return null;
 			}
 		}

@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public abstract class Pool {
 
-	public String propertiesName = "connection-conf.properties";
+	public String propertiesName = "/connection-conf.properties";
 
 	private static Pool instance = null;// 定义唯一实例
 
