@@ -33,15 +33,24 @@ public final class DBConnectionPool extends Pool {
 	// 懒汉模式写法
 	public static synchronized DBConnectionPool getInstance() {
 		if (pool == null) {
-			pool = new DBConnectionPool();
+			pool = new DBConnectionPool(null);
+		}
+		return pool;
+	}
+
+	// 生成数据连接池
+	// 懒汉模式写法
+	public static synchronized DBConnectionPool getInstance(DBProperties properties) {
+		if (pool == null) {
+			pool = new DBConnectionPool(properties);
 		}
 		return pool;
 	}
 
 	// 私有构造方法，获得一个数据连接实例
-	private DBConnectionPool() {
+	private DBConnectionPool(DBProperties properties) {
 		try {
-			init();
+			init(properties);
 			for (int i = 0; i < normalConnect; i++) {
 				Connection conn = newConnection();
 				if (conn != null) {
@@ -54,7 +63,17 @@ public final class DBConnectionPool extends Pool {
 		}
 	}
 
-	private void init() throws IOException {
+	private void init(DBProperties properties) throws IOException {
+		if (properties != null) {
+			this.username = properties.getUsername();
+			this.password = properties.getPassword();
+			this.url = properties.getUrl();
+			this.dirvername = properties.getDirvername();
+			this.maxConnect = properties.getMaxConnect();
+			this.normalConnect = properties.getNormalConnect();
+			this.connectionTimeOut = properties.getConnectionTimeOut();
+			return;
+		}
 		InputStream is = Pool.class.getResourceAsStream(propertiesName);
 		Properties prop = new Properties();
 		prop.load(is);
@@ -93,7 +112,7 @@ public final class DBConnectionPool extends Pool {
 
 	@Override
 	public void createdPool() {
-		pool = new DBConnectionPool();
+		pool = new DBConnectionPool(null);
 		if (pool == null) {
 			System.err.println("创建线程池失败");
 		}
